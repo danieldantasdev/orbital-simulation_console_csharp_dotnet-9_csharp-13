@@ -1,0 +1,6 @@
+﻿services:
+  orbitalsimulator:
+    image: orbitalsimulator
+    build:
+      context: .
+      dockerfile: OrbitalSimulator/Dockerfile
