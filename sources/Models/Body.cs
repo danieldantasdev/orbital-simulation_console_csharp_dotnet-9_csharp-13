@@ -1,4 +1,4 @@
-namespace OrbitalSimulator;
+namespace OrbitalSimulator.Models;
 
 public class Body(string name, double mass, (double x, double y) position, (double x, double y) velocity)
 {

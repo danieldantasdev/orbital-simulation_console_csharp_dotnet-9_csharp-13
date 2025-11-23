@@ -15,8 +15,16 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="OxyPlot.Core" Version="2.2.0" />
-      <PackageReference Include="OxyPlot.SkiaSharp" Version="2.2.0" />
+        <!-- OpenTK para o Plotter3D -->
+        <PackageReference Include="OpenTK" Version="4.7.6" />
+
+        <!-- OxyPlot para o Plotter2D -->
+        <PackageReference Include="OxyPlot.Core" Version="2.2.0" />
+        <PackageReference Include="OxyPlot.SkiaSharp" Version="2.2.0" />
+
+        <!-- Necessário para salvar PNG via Bitmap -->
+        <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.2" />
     </ItemGroup>
 
 </Project>

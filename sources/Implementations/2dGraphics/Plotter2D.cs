@@ -1,13 +1,12 @@
-using OxyPlot.Annotations;
-
-namespace OrbitalSimulator;
-
+using OrbitalSimulator.Interfaces;
 using OxyPlot;
+using OxyPlot.Annotations;
 using OxyPlot.Series;
 using OxyPlot.SkiaSharp;
-using System.IO;
 
-public class Plotter
+namespace OrbitalSimulator.Implementations._2dGraphics;
+
+public class Plotter2D : IPlotter
 {
     private readonly PlotModel _plotModel = new() { Title = "Orbital Simulation" };
     
@@ -23,17 +22,26 @@ public class Plotter
             Stroke = OxyColors.Black,
             StrokeThickness = 1,
         };
+
         _plotModel.Annotations.Add(textAnnotation);
     }
 
-
     public void AddTrajectory(string bodyName, List<(double x, double y)> trajectory)
     {
+        // var series = new LineSeries { Title = bodyName };
+        //
+        // foreach (var point in trajectory)
+        //     series.Points.Add(new DataPoint(point.x, point.y));
+        //
+        // _plotModel.Series.Add(series);
+        
         LineSeries series = new () { Title = bodyName };
+        
         foreach ((double x, double y) point in trajectory)
         {
             series.Points.Add(new DataPoint(point.x, point.y));
         }
+        
         _plotModel.Series.Add(series);
     }
 
@@ -43,13 +51,12 @@ public class Plotter
         string outputDirectory = Path.Combine(rootPath, "Plots");
 
         Directory.CreateDirectory(outputDirectory);
-
         string filePath = Path.Combine(outputDirectory, fileName);
 
         using var stream = File.Create(filePath);
         var exporter = new PngExporter { Width = 800, Height = 600 };
         exporter.Export(_plotModel, stream);
 
-        Console.WriteLine($"Arquivo salvo em: {filePath}");
+        Console.WriteLine($"[2D] Arquivo salvo em: {filePath}");
     }
 }
