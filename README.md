@@ -148,6 +148,10 @@ simulator.ExecuteInteractive();
 
 ![gráfico](sources/Plots/solar_system_simulation.png)
 
+## 🖼 Exemplo de Gráfico 3D
+
+![gráfico](assets/solar_system_simulation.gif)
+
 ---
 
 ## 🧪 Roadmap (Próximas Funcionalidades)
