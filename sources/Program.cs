@@ -1,4 +1,4 @@
-﻿using OrbitalSimulator;
+﻿using OrbitalSimulator.Implementations.Calcules;
 
 Simulator simulator = new ();
-simulator.Execute();
+simulator.ExecuteInteractive();
