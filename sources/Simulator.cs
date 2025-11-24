@@ -1,4 +1,3 @@
-using OrbitalSimulator.Implementations;
 using OrbitalSimulator.Implementations._2dGraphics;
 using OrbitalSimulator.Implementations._3dGraphics;
 using OrbitalSimulator.Interfaces;
