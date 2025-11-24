@@ -1,72 +1,163 @@
-# Simulador de Órbitas Planetárias
+# 🌌 Simulador de Órbitas Planetárias (2D e 3D)
 
-Este é um simulador de órbitas planetárias desenvolvido em C# que modela a dinâmica de corpos celestes no Sistema Solar. O projeto utiliza o OxyPlot para visualização das trajetórias e geração de gráficos, e calcula as órbitas com base nas leis da gravitação universal de Newton.
+Este é um simulador completo de órbitas planetárias desenvolvido em **C#** que modela a dinâmica dos corpos celestes do Sistema Solar utilizando as leis da gravitação universal de Newton.  
+O projeto suporta **visualização 2D** e **visualização 3D interativa**, ambas derivadas da mesma simulação física.
 
 ![img.png](assets/images/formules.png)
 
+---
+
 ## Funcionalidades
 
-- F1 - Simular o movimento dos planetas e de algumas luas do Sistema Solar.
-- F2 - Calcular as forças gravitacionais entre os corpos com base nas massas e distâncias.
-- F3 - Gerar um gráfico 2D mostrando as trajetórias orbitais dos corpos.
-- F4 - Exibir o nome de cada corpo na posição final de sua órbita.
+### F1 — Simulação Física Realista
+- Modelagem baseada na gravitação universal.
+- Suporte a planetas, luas e múltiplos corpos arbitrários.
+- Intervalos temporais configuráveis.
 
-## Tecnologias Utilizadas
+### F2 — Cálculo de Interações Gravitacionais
+- Força gravitacional calculada para todos os pares de corpos.
+- Atualização contínua das velocidades e posições via integração numérica.
 
-- **C#**: Linguagem de programação principal.
-- **OxyPlot**: Biblioteca para gráficos e visualizações.
-- **Math.NET Numerics**: Biblioteca para cálculos matemáticos.
-- **SkiaSharp**: Biblioteca para renderização de gráficos em PNG.
+### F3 — Visualização 2D com OxyPlot
+- Trajetórias orbitais em 2D com diferentes cores.
+- Exportação automática para PNG no diretório **`Plots`**.
+- Nomes exibidos na posição final das órbitas.
 
-## Como Funciona
+### F4 — Visualização 3D Interativa com OpenTK (OpenGL)
+- Janela 3D com:
+    - Rotação do espaço (orbit camera)
+    - Zoom com scroll
+    - Cores distintas por corpo de acordo com o planeta real
+    - Renderização via shaders
+    - Esferas representando os corpos celestes
+- Pressione **F12** para salvar um screenshot em **`Plots/screenshot_3D_*.png`**
 
-O simulador funciona em uma simulação temporal, onde os corpos (planetas, luas, etc.) interagem entre si por forças gravitacionais. O código utiliza a fórmula de gravitação universal para calcular as forças de atração entre os corpos e, a partir disso, calcula suas posições e velocidades ao longo do tempo.
+### F5 — Exportação das Imagens
+- **2D:** PNG via OxyPlot + SkiaSharp
+- **3D:** Captura do framebuffer OpenGL via ImageSharp
+- Todas as imagens são salvas no mesmo diretório:
 
-### Passos da Simulação
+```
+/Plots
+```
 
-1. **Inicialização**: Definição dos corpos celestes com suas massas, posições iniciais e velocidades.
-2. **Cálculo das Forças**: Para cada passo de tempo, a gravidade é calculada entre todos os pares de corpos.
-3. **Atualização das Posições**: A posição de cada corpo é atualizada com base nas forças e velocidades calculadas.
-4. **Geração de Gráfico**: As trajetórias de cada corpo são armazenadas e plotadas em um gráfico 2D.
-5. **Exportação do Gráfico**: O gráfico gerado é salvo como uma imagem PNG.
+---
 
-## Estrutura do Projeto
+## 🧰 Tecnologias Utilizadas
 
-- **`Simulator.cs`**: Contém a lógica de simulação, incluindo os cálculos de gravitação e atualização de posições.
-- **`Plotter.cs`**: Responsável por gerar e salvar o gráfico das trajetórias orbitais.
-- **`Program.cs`**: Ponto de entrada para a execução do simulador.
-- **`Body.cs`**: Define os corpos celestes, suas propriedades e como interagem na simulação.
+### Backend
+- **C# (.NET 9)**
+- **Math.NET Numerics** – cálculos físicos e matemáticos
+- **Newtonian Physics Engine (custom)**
 
-## Exemplo de Uso
+### Visualização 2D
+- **OxyPlot**
+- **SkiaSharp**
 
-### Inicializando o Simulador
+### Visualização 3D
+- **OpenTK 4.0 (OpenGL 3.3 Core)**
+- **ImageSharp**
+- **GLSL shaders**
 
-O simulador é configurado com os seguintes corpos do Sistema Solar:
+---
 
-- **Sol**
-- **Mercúrio**
-- **Vênus**
-- **Terra**
-- **Marte**
-- **Júpiter**
-- **Saturno**
-- **Urano**
-- **Netuno**
-- **Lua** (satélite da Terra)
-- **Io, Europa, Ganimedes, Calisto** (satélites de Júpiter)
+## ⚙️ Como Funciona o Simulador
 
-### Executando a Simulação
+### 1️⃣ Inicialização
+Cada corpo é definido com:
+- massa
+- posição inicial
+- velocidade inicial
 
-A simulação é executada com o seguinte código no `Program.cs`:
+### 2️⃣ Cálculo das Forças
+Para cada par de corpos:
+
+$begin:math:display$
+F = G \\frac{m_1 m_2}{r^2}
+$end:math:display$
+
+### 3️⃣ Integração Temporal
+A cada passo:
+
+$$
+v = v + a \cdot \Delta t
+$$
+
+$$
+x = x + v \cdot \Delta t
+$$
+
+### 4️⃣ Armazenamento das Trajetórias
+Todos os pontos são registrados para posterior plotagem.
+
+### 5️⃣ Plotagem e Exportação
+- O **Plotter2D** gera o PNG automaticamente.
+- O **Plotter3D** exibe a simulação em tempo real e salva screenshots com F12.
+
+---
+
+## 📁 Estrutura do Projeto
+
+```
+/sources
+   /Models
+       Body.cs
+   /Simulation
+       Simulator.cs
+   /Plotters
+       Plotter2D.cs
+       Plotter3D.cs
+   /shaders
+       basic.vert
+       basic.frag
+   Program.cs
+/Plots
+```
+
+### Arquivos-chave
+
+- **Simulator.cs** — núcleo da física do sistema.
+- **Plotter2D.cs** — renderização das órbitas em plano 2D.
+- **Plotter3D.cs** — visualização e renderização OpenGL.
+- **Body.cs** — representa cada corpo celeste.
+- **Shaders** — definem o comportamento visual no 3D.
+
+---
+
+## ▶️ Exemplo de Uso
+
+No `Program.cs`:
 
 ```csharp
 Simulator simulator = new();
-simulator.Execute();
+simulator.ExecuteInteractive();
 ```
 
-Isso cria e simula os movimentos dos corpos celestes durante um período de um ano (365 dias), com um intervalo de tempo de 86400 segundos (1 dia).
+### Saída:
 
-### Gerando o Gráfico
-O gráfico gerado será salvo como uma imagem PNG no diretório Plots, e pode ser visualizado ou compartilhado.
+- **2D:**  
+  `Plots/solar_system_simulation_2d_yyyyMMdd_HHmmss.png`
+
+- **3D:**  
+  Pressione **F12** na janela e será salvo em:  
+  `Plots/solar_system_simulation_2d_yyyyMMdd_HHmmss.png`
+
+---
+
+## 🖼 Exemplo de Gráfico 2D
 
 ![gráfico](sources/Plots/solar_system_simulation.png)
+
+---
+
+## 🧪 Roadmap (Próximas Funcionalidades)
+
+- Animação real-time contínua no 3D
+- Melhoria dos shaders (Phong/Blinn-Phong)
+- Visualização de vetores (velocidade, aceleração, força)
+- Controles adicionais via UI
+
+---
+
+## 📜 Licença
+Este projeto é open-source. Sinta-se livre para modificar e expandir.
