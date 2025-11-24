@@ -11,12 +11,14 @@ using Image = SixLabors.ImageSharp.Image;
 
 namespace OrbitalSimulator.Implementations._3dGraphics;
 
-public class OrbitWindow : GameWindow
+public class OrbitWindow(
+    GameWindowSettings gws,
+    NativeWindowSettings nws,
+    Dictionary<string, List<Vector3>> traj,
+    Dictionary<string, Vector3> names)
+    : GameWindow(gws, nws)
 {
-    private readonly Dictionary<string, List<Vector3>> trajectories;
-    private readonly Dictionary<string, Vector3> finalPositions;
-    
-    private readonly Dictionary<string, Color4> planetColors = new()
+    private readonly Dictionary<string, Color4> _planetColors = new()
     {
         ["Mercury"] = Color4.Gray,
         ["Venus"] = Color4.Orange,
@@ -30,31 +32,20 @@ public class OrbitWindow : GameWindow
     };
 
     // Câmera Orbit
-    private float yaw = 45;
-    private float pitch = -20;
-    private float distance = 3f;
-    private Vector2 lastMouse;
-    private bool rotating;
+    private float _yaw = 45;
+    private float _pitch = -20;
+    private float _distance = 3f;
+    private Vector2 _lastMouse;
+    private bool _rotating;
 
-    private Shader shader;
-    private int lineVao;
-    private int lineVbo;
+    private Shader _shader;
+    private int _lineVao;
+    private int _lineVbo;
 
-    private SphereMesh sphereMesh;
-    private int sphereVao;
-    private int sphereVbo;
-    private int sphereEbo;
-
-    public OrbitWindow(
-        GameWindowSettings gws,
-        NativeWindowSettings nws,
-        Dictionary<string, List<Vector3>> traj,
-        Dictionary<string, Vector3> names)
-        : base(gws, nws)
-    {
-        trajectories = traj;
-        finalPositions = names;
-    }
+    private SphereMesh _sphereMesh;
+    private int _sphereVao;
+    private int _sphereVbo;
+    private int _sphereEbo;
 
     protected override void OnLoad()
     {
@@ -73,31 +64,31 @@ public class OrbitWindow : GameWindow
         Console.WriteLine("Vertex Shader: " + vertPath);
         Console.WriteLine("Fragment Shader: " + fragPath);
 
-        shader = new Shader(vertPath, fragPath);
+        _shader = new Shader(vertPath, fragPath);
         
-        sphereMesh = SphereMeshGenerator.CreateSphere(24, 24);
+        _sphereMesh = SphereMeshGenerator.CreateSphere(24, 24);
 
         // Linha VAO/VBO
-        lineVao = GL.GenVertexArray();
-        lineVbo = GL.GenBuffer();
+        _lineVao = GL.GenVertexArray();
+        _lineVbo = GL.GenBuffer();
 
         // Esfera VAO/VBO/EBO
-        sphereVao = GL.GenVertexArray();
-        sphereVbo = GL.GenBuffer();
-        sphereEbo = GL.GenBuffer();
+        _sphereVao = GL.GenVertexArray();
+        _sphereVbo = GL.GenBuffer();
+        _sphereEbo = GL.GenBuffer();
 
-        GL.BindVertexArray(sphereVao);
+        GL.BindVertexArray(_sphereVao);
 
-        GL.BindBuffer(BufferTarget.ArrayBuffer, sphereVbo);
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _sphereVbo);
         GL.BufferData(BufferTarget.ArrayBuffer,
-            sphereMesh.Vertices.Length * sizeof(float),
-            sphereMesh.Vertices,
+            _sphereMesh.Vertices.Length * sizeof(float),
+            _sphereMesh.Vertices,
             BufferUsageHint.StaticDraw);
 
-        GL.BindBuffer(BufferTarget.ElementArrayBuffer, sphereEbo);
+        GL.BindBuffer(BufferTarget.ElementArrayBuffer, _sphereEbo);
         GL.BufferData(BufferTarget.ElementArrayBuffer,
-            sphereMesh.Indices.Length * sizeof(uint),
-            sphereMesh.Indices,
+            _sphereMesh.Indices.Length * sizeof(uint),
+            _sphereMesh.Indices,
             BufferUsageHint.StaticDraw);
 
         GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
@@ -110,8 +101,8 @@ public class OrbitWindow : GameWindow
     {
         if (e.Button == MouseButton.Left)
         {
-            rotating = true;
-            lastMouse = MousePosition;
+            _rotating = true;
+            _lastMouse = MousePosition;
         }
 
         base.OnMouseDown(e);
@@ -120,28 +111,28 @@ public class OrbitWindow : GameWindow
     protected override void OnMouseUp(MouseButtonEventArgs e)
     {
         if (e.Button == MouseButton.Left)
-            rotating = false;
+            _rotating = false;
 
         base.OnMouseUp(e);
     }
 
     protected override void OnMouseMove(MouseMoveEventArgs e)
     {
-        if (!rotating) return;
+        if (!_rotating) return;
 
-        var delta = e.Position - lastMouse;
-        lastMouse = e.Position;
+        var delta = e.Position - _lastMouse;
+        _lastMouse = e.Position;
 
-        yaw += delta.X * 0.3f;
-        pitch += delta.Y * 0.3f;
+        _yaw += delta.X * 0.3f;
+        _pitch += delta.Y * 0.3f;
 
         base.OnMouseMove(e);
     }
 
     protected override void OnMouseWheel(MouseWheelEventArgs e)
     {
-        distance -= e.OffsetY * 5f;
-        if (distance < 10) distance = 10;
+        _distance -= e.OffsetY * 5f;
+        if (_distance < 10) _distance = 10;
 
         base.OnMouseWheel(e);
     }
@@ -152,7 +143,7 @@ public class OrbitWindow : GameWindow
 
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-        shader.Use();
+        _shader.Use();
 
         var projection = Matrix4.CreatePerspectiveFieldOfView(
             MathHelper.DegreesToRadians(45),
@@ -161,17 +152,17 @@ public class OrbitWindow : GameWindow
             10000f);
 
         var cameraPos = new Vector3(
-            distance * MathF.Cos(MathHelper.DegreesToRadians(pitch)) *
-            MathF.Cos(MathHelper.DegreesToRadians(yaw)),
-            distance * MathF.Sin(MathHelper.DegreesToRadians(pitch)),
-            distance * MathF.Cos(MathHelper.DegreesToRadians(pitch)) *
-            MathF.Sin(MathHelper.DegreesToRadians(yaw))
+            _distance * MathF.Cos(MathHelper.DegreesToRadians(_pitch)) *
+            MathF.Cos(MathHelper.DegreesToRadians(_yaw)),
+            _distance * MathF.Sin(MathHelper.DegreesToRadians(_pitch)),
+            _distance * MathF.Cos(MathHelper.DegreesToRadians(_pitch)) *
+            MathF.Sin(MathHelper.DegreesToRadians(_yaw))
         );
 
         var view = Matrix4.LookAt(cameraPos, Vector3.Zero, Vector3.UnitY);
 
-        shader.SetMatrix4("projection", projection);
-        shader.SetMatrix4("view", view);
+        _shader.SetMatrix4("projection", projection);
+        _shader.SetMatrix4("view", view);
 
         DrawAllTrajectories();
         DrawAllBodies();
@@ -182,14 +173,14 @@ public class OrbitWindow : GameWindow
     private void DrawAllTrajectories()
     {
         var identity = Matrix4.Identity;
-        shader.SetMatrix4("model", identity);
+        _shader.SetMatrix4("model", identity);
 
-        foreach (var track in trajectories.Values)
+        foreach (var track in traj.Values)
         {
             float[] vertices = track.SelectMany(v => new[] { v.X, v.Y, v.Z }).ToArray();
 
-            GL.BindVertexArray(lineVao);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, lineVbo);
+            GL.BindVertexArray(_lineVao);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _lineVbo);
             GL.BufferData(BufferTarget.ArrayBuffer,
                 vertices.Length * sizeof(float), vertices,
                 BufferUsageHint.DynamicDraw);
@@ -197,10 +188,10 @@ public class OrbitWindow : GameWindow
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
 
-            var name = trajectories.First(t => t.Value == track).Key;
-            Color4 c = planetColors.ContainsKey(name) ? planetColors[name] : Color4.White;
+            var name = traj.First(t => t.Value == track).Key;
+            Color4 c = _planetColors.ContainsKey(name) ? _planetColors[name] : Color4.White;
 
-            shader.SetVector3("uColor", new Vector3(c.R, c.G, c.B));
+            _shader.SetVector3("uColor", new Vector3(c.R, c.G, c.B));
 
             GL.DrawArrays(PrimitiveType.LineStrip, 0, track.Count);        
         }
@@ -208,14 +199,14 @@ public class OrbitWindow : GameWindow
 
     private void DrawAllBodies()
     {
-        GL.BindVertexArray(sphereVao);
+        GL.BindVertexArray(_sphereVao);
 
-        foreach (var pos in finalPositions.Values)
+        foreach (var pos in names.Values)
         {
             var model = Matrix4.CreateTranslation(pos);
-            shader.SetMatrix4("model", model);
+            _shader.SetMatrix4("model", model);
 
-            GL.DrawElements(PrimitiveType.Triangles, sphereMesh.Indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(PrimitiveType.Triangles, _sphereMesh.Indices.Length, DrawElementsType.UnsignedInt, 0);
         }
     }
 
