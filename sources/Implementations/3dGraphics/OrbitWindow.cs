@@ -226,24 +226,6 @@ public class OrbitWindow : GameWindow
 
         base.OnKeyDown(e);
     }
-
-    // private void SaveScreenshot()
-    // {
-    //     Directory.CreateDirectory("Plots3D");
-    //     string path = $"Plots3D/screenshot_{DateTime.Now:yyyyMMdd_HHmmss}.png";
-    //
-    //     int w = Size.X;
-    //     int h = Size.Y;
-    //
-    //     byte[] pixels = new byte[w * h * 3];
-    //     GL.ReadPixels(0, 0, w, h, PixelFormat.Rgb, PixelType.UnsignedByte, pixels);
-    //
-    //     using var img = Image.LoadPixelData<Rgb24>(pixels, w, h);
-    //     img.Mutate(x => x.Flip(FlipMode.Vertical));
-    //     img.Save(path);
-    //
-    //     Console.WriteLine($"Screenshot salvo: {path}");
-    // }
     
     private void SaveScreenshot()
     {
