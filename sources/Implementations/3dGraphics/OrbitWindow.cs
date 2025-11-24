@@ -201,12 +201,24 @@ public class OrbitWindow(
     {
         GL.BindVertexArray(_sphereVao);
 
-        foreach (var pos in names.Values)
+        foreach (var kv in names)
         {
+            string name = kv.Key;
+            var pos = kv.Value;
+
             var model = Matrix4.CreateTranslation(pos);
             _shader.SetMatrix4("model", model);
 
-            GL.DrawElements(PrimitiveType.Triangles, _sphereMesh.Indices.Length, DrawElementsType.UnsignedInt, 0);
+            Color4 color = _planetColors.ContainsKey(name) 
+                ? _planetColors[name] 
+                : Color4.White;
+
+            _shader.SetVector3("uColor", new Vector3(color.R, color.G, color.B));
+
+            GL.DrawElements(PrimitiveType.Triangles,
+                _sphereMesh.Indices.Length,
+                DrawElementsType.UnsignedInt,
+                0);
         }
     }
 
